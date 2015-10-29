@@ -2,7 +2,7 @@
 #   Make hubot learn and reply, when no other script is triggered.
 #
 # Dependencies:
-#   "ector": "^0.1.7"
+#   "ector": "^0.1.6"
 #
 # Configuration:
 #   None
@@ -11,7 +11,6 @@
 #   sentence not triggering any other command - Makes hubot reply (see "shut up" and "speak").
 #   hubot shut up - Make hubot quiet.
 #   hubot speak - Make hubot speak again.
-#   hubot just listen - Make the bot learn while quiet
 #
 # Notes:
 #   None
@@ -23,7 +22,8 @@ util = require 'util'
 Ector = require 'ector'
 FileConceptNetwork =  require('file-concept-network').FileConceptNetwork
 
-file_backup = "cn.json"
+dirname = __dirname.split('/')
+file_backup = dirname.slice(0,5).join('/')+'/scripts/cn.json'
 ector = new Ector()
 ector.injectConceptNetwork FileConceptNetwork
 ector.cn.load file_backup, (err) ->
@@ -41,13 +41,8 @@ module.exports = (robot) ->
   robot.respond /shut up/i, (msg) ->
     quiet = true
 
-  robot.respond /just listen/i, (msg) ->
-    just_listening = true
-    msg.reply "Now I'm just listening."
-
   robot.respond /speak/i, (msg) ->
     quiet = false
-    just_listening= false
     msg.reply msg.random speakReplies
 
   robot.respond /save yourself/i, (msg) ->
@@ -59,11 +54,10 @@ module.exports = (robot) ->
 
   robot.catchAll (msg) ->
     if not quiet
-      text = msg.message.text
+      text = msg.message.text.replace robot.name+' ', ''
       ector.setUser msg.message.user.name
       ector.addEntry text
-      if not just_listening
-        ector.linkNodesToLastSentence previousResponseNodes
-        response = ector.generateResponse()
-        previousResponseNodes = response.nodes
-        msg.reply response.sentence
+      ector.linkNodesToLastSentence previousResponseNodes
+      response = ector.generateResponse()
+      previousResponseNodes = response.nodes
+      msg.send response.sentence
