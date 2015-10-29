@@ -23,7 +23,9 @@ Ector = require 'ector'
 FileConceptNetwork =  require('file-concept-network').FileConceptNetwork
 
 dirname = __dirname.split('/')
-file_backup = dirname.slice(0,5).join('/')+'/scripts/cn.json'
+inde = dirname.indexOf 'node_modules'
+file_backup = dirname.slice(0,inde).join('/')+'/scripts/cn.json'
+console.log file_backup
 ector = new Ector()
 ector.injectConceptNetwork FileConceptNetwork
 ector.cn.load file_backup, (err) ->
