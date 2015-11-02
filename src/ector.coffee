@@ -55,11 +55,11 @@ module.exports = (robot) ->
         msg.reply "Thanks, My mind is safe now!"
 
   robot.catchAll (msg) ->
-    if not quiet
-      text = msg.message.text.replace robot.name+' ', ''
-      ector.setUser msg.message.user.name
-      ector.addEntry text
-      ector.linkNodesToLastSentence previousResponseNodes
+    text = msg.message.text.replace robot.name+' ', ''
+    ector.setUser msg.message.user.name
+    ector.addEntry text
+    ector.linkNodesToLastSentence previousResponseNodes
+    if not quiet and msg.message.room not in ['general'] and (msg.message.text.indexOf(robot.name) > -1)
       response = ector.generateResponse()
       previousResponseNodes = response.nodes
       msg.send response.sentence
